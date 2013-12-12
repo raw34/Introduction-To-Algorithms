@@ -1,2 +1,2 @@
-Introduction-to-Algorithm-php
+Introduction-to-Algorithm
 =============================
