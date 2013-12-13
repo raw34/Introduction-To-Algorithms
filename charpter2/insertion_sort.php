@@ -12,11 +12,9 @@ function insertion_sort($a) {
     return $a;
 }
 
-/*
 $arr = range(1, 10);
 shuffle($arr);
 echo '<pre>'; var_dump($arr); echo '</pre>';
 $arr = insertion_sort($arr);
 echo '<pre>'; var_dump($arr); echo '</pre>';
- */
 ?>
