@@ -16,6 +16,7 @@ function partition(&$a, $p, $r) {
     }
     $i++;
     swap($a[$i], $a[$r]);
+    //echo '<pre>'; var_dump($a); echo '</pre>';
     return $i;
 }
 
@@ -36,6 +37,7 @@ function randomized_partition(&$a, $p, $r) {
 function randomized_quick_sort(&$a, $p, $r) {
     if ($p < $r) {
         $q = randomized_partition($a, $p, $r);
+        //echo '<br/> q = ', $q;
         randomized_quick_sort($a, $p, $q - 1);
         randomized_quick_sort($a, $q + 1, $r);
     }
