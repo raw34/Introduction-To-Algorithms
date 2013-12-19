@@ -1,14 +1,14 @@
 <?php 
 function max_bit($num) {
     $bits = 1;
-    while ($num / 10) {
+    while (intval($num / 10)) {
         $bits++;
         $num /= 10;
     }
     return $bits;
 }
 
-function counting_sort(&$a, &$t, &$b, $k) {
+function counting_sort(&$a, &$b, $k, &$t) {
     $c = range(1, $k);
     $size = count($t);
     for ($i = 0; $i <= $k; $i++) {
@@ -24,19 +24,21 @@ function counting_sort(&$a, &$t, &$b, $k) {
         $b[$c[$t[$i]] - 1] = $a[$i] ;
         $c[$t[$i]]--;
     }
+    #echo '<pre>'; var_dump($b); echo '</pre>';
 }
 
 function radix_sort(&$a, $n) {
     $t = $b = range(1, $n);
     $d = max_bit(max($a));
-    echo '<br/>最大数字长度 = ', $d;
+    //echo '<br/>最大数字长度 = ', $d;
     $radix = 1;
 
     for ($i = 0; $i < $d; $i++, $radix *= 10) {
         for ($j = 0; $j < $n; $j++) {
             $t[$j] = $a[$j] / $radix % 10;
         }
-        counting_sort($a, $t, $b, max($t));
+        //echo '<pre>'; var_dump($t); echo '</pre>';
+        counting_sort($a, $b, max($t), $t);
     }
     $a = $b;
 }
