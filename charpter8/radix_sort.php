@@ -21,9 +21,10 @@ function counting_sort(&$a, &$b, $k, &$t) {
         $c[$i] = $c[$i] + $c[$i - 1];
     }
     for ($i = $size - 1; $i >= 0; $i--) {
-        $b[$c[$t[$i]] - 1] = $a[$i] ;
+        $b[$c[$t[$i]] - 1] = $a[$i];
         $c[$t[$i]]--;
     }
+    $a = $b;
     #echo '<pre>'; var_dump($b); echo '</pre>';
 }
 
