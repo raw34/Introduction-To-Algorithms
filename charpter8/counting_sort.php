@@ -1,20 +1,23 @@
 <?php 
-function counting_sort(&$a, &$b, $k) {
+function counting_sort(&$a, &$b, $k, &$t = null) {
     $c = range(1, $k);
-    $size = count($a);
+    $t = $t == null ? $a : $t;
+    $size = count($t);
     for ($i = 0; $i <= $k; $i++) {
         $c[$i] = 0; 
     }
     for ($i = 0; $i < $size; $i++) {
-        $c[$a[$i]]++;
+        $c[$t[$i]]++;
     }
     for ($i = 1; $i <= $k; $i++) {
         $c[$i] = $c[$i] + $c[$i - 1];
     }
     for ($i = $size - 1; $i >= 0; $i--) {
-        $b[$c[$a[$i]] - 1] = $a[$i] ;
-        $c[$a[$i]]--;
+        $b[$c[$t[$i]] - 1] = $a[$i];
+        $c[$t[$i]]--;
     }
+    $a = $b;
+    //echo '<pre>'; var_dump($b); echo '</pre>';
 }
 
 $arr1 = range(1, 10);
