@@ -1,367 +1,403 @@
 <?php
 /**
- *二叉树的创建及基本操作
- *
- *1.构造方法,初始化建立二叉树
- *2.按先序遍历方式建立二叉树
- *3.按先序遍历二叉树
- *4.先序遍历的非递归算法
- *5.中序遍历二叉树
- *6.中序遍历的非递归算法
- *7.后序遍历二叉树
- *8.后序遍历非递归算法
- *9.层次遍历二叉树
- *10.求二叉树叶子结点的个数
- *11.求二叉树的深度
- *12.判断二叉树是否为空树
- *13.置空二叉树
- *
- *@author xudianyang<>
- *@version $Id:BinaryTree.class.php,v 1.0 2011/02/13 13:33:00 uw Exp
- *@copyright &copy;2011,xudianyang
-header('content-type:text/html;charset=gb2312');
-
-//在PHP数据结构之五 栈的PHP的实现和栈的基本操作 可以找到该类
-include_once("./StackLinked.class.php");
-
-//在 PHP数据结构之七 队列的链式存储和队列的基本操作 可以找到该类
-include_once('./QueueLinked.class.php');
+ * 二叉树的定义
  */
-class BTNode{
-    //左子树“指针”
-    public $mLchild=null;
-    //右子树“指针”
-    public $mRchild=null;
-    //结点数据域
-    public $mData=null; //左标志域，为1时表示mLchild“指向”结点左孩子，为2表示“指向”结点直接前驱
-    public $intLeftTag=null;
-    //右标志域，为1时表示mRchild“指向”结点右孩子，为2表示“指向”结点直接后继
-    public $intRightTag=null;
-}
-class BinaryTree{
-    //根结点
-    public $mRoot;
-    //根据先序遍历录入的二叉树数据
-    public $mPBTdata=null;
+class BinaryTree {
+    protected $key = NULL;      //  当前节点的值
+    protected $left = NULL;     //  左子树
+    protected $right = NULL;    //  右子树
+ 
     /**
-     *构造方法,初始化建立二叉树
+     * 以指定的值构造二叉树，并指定左右子树
      *
-     *@param array $btdata 根据先序遍历录入的二叉树的数据，一维数组，每一个元素代表二叉树一个结点值,扩充结点值为''[长度为0的字符串]
-     *@return void
+     * @param mixed $key 节点的值.
+     * @param mixed $left 左子树节点.
+     * @param mixed $right 右子树节点.
      */
-    public function __construct($btdata=array()){
-        $this->mPBTdata=$btdata;
-        $this->mRoot=null;
-        $this->getPreorderTraversalCreate($this->mRoot);
-    }
-    /**
-     *按先序遍历方式建立二叉树
-     *
-     *@param BTNode 二叉树结点，按引用方式传递
-     *@return void
-     */
-    public function getPreorderTraversalCreate(&$btnode){
-        $elem=array_shift($this->mPBTdata);
-        if($elem === ''){
-            $btnode=null;
-        }else if($elem === null){
-            return;
-        }else{
-            $btnode=new BTNode();
-            $btnode->mData=$elem;
-            $this->getPreorderTraversalCreate($btnode->mLchild);
-            $this->getPreorderTraversalCreate($btnode->mRchild);
+    public function __construct( $key = NULL, $left = NULL, $right = NULL) {
+        $this->key = $key;
+        if ($key === NULL) {
+            $this->left = NULL;
+            $this->right = NULL;
+        }
+        elseif ($left === NULL) {
+            $this->left = new BinaryTree();
+            $this->right = new BinaryTree();
+        }
+        else {
+            $this->left = $left;
+            $this->right = $right;
         }
     }
+ 
     /**
-     *判断二叉树是否为空
+     * 析构方法.
+     */
+    public function __destruct() {
+        $this->key = NULL;
+        $this->left = NULL;
+        $this->right = NULL;
+    }
+ 
+    /**
+    * 清空二叉树.
+    **/
+    public function purge () {
+        $this->key = NULL;
+        $this->left = NULL;
+        $this->right = NULL;
+    }
+ 
+    /**
+     * 测试当前节点是否是叶节点.
      *
-     *@return boolean 如果二叉树不空返回true,否则返回false
-     **/
-    public function getIsEmpty(){
-        if($this->mRoot instanceof BTNode){
+     * @return boolean 如果节点非空并且有两个空的子树时为真，否则为假.
+     */
+    public function isLeaf() {
+        return !$this->isEmpty() &&
+            $this->left->isEmpty() &&
+            $this->right->isEmpty();
+    }
+ 
+    /**
+     * 测试节点是否为空
+     *
+     * @return boolean 如果节点为空返回真，否则为假.
+     */
+    public function isEmpty() {
+        return $this->key === NULL;
+    }
+ 
+    /**
+     * Key getter.
+     *
+     * @return mixed 节点的值.
+     */
+    public function getKey() {
+        if ($this->isEmpty()) {
             return false;
-        }else{
-            return true;
         }
+        return $this->key;
     }
+ 
+ 
     /**
-     *将二叉树置空
+     * 给节点指定Key值,节点必须为空
      *
-     *@return void
+     * @param mixed $object 添加的Key值.
      */
-    public function setBinaryTreeNull(){
-        $this->mRoot=null;
+    public function attachKey($obj) {
+        if (!$this->isEmpty())
+            return false;
+        $this->key = $obj;
+        $this->left = new BinaryTree();
+        $this->right = new BinaryTree();
     }
+ 
     /**
-     *按先序遍历二叉树
-     *
-     *@param BTNode $rootnode 遍历过程中的根结点
-     *@param array $btarr 接收值的数组变量，按引用方式传递
-     *@return void
+     * 删除key值，使得节点为空.
      */
-    public function getPreorderTraversal($rootnode,&$btarr){
-        if($rootnode!=null){
-            $btarr[]=$rootnode->mData;
-            $this->getPreorderTraversal($rootnode->mLchild,$btarr);
-            $this->getPreorderTraversal($rootnode->mRchild,$btarr);
-        }
+    public function detachKey() {
+        if (!$this->isLeaf())
+            return false;
+        $result = $this->key;
+        $this->key = NULL;
+        $this->left = NULL;
+        $this->right = NULL;
+        return $result;
     }
+ 
     /**
-     *先序遍历的非递归算法
+     * 返回左子树
      *
-     *@param BTNode $objRootNode 二叉树根节点
-     *@param array $arrBTdata 接收值的数组变量，按引用方式传递
-     *@return void
+     * @return object BinaryTree 当前节点的左子树.
      */
-    public function getPreorderTraversalNoRecursion($objRootNode,&$arrBTdata){
-        if($objRootNode instanceof BTNode){
-            $objNode=$objRootNode;
-            $objStack=new StackLinked();
-            do{
-                $arrBTdata[]=$objNode->mData;
-                $objRNode=$objNode->mRchild;
-                if($objRNode !=null){
-                    $objStack->getPushStack($objRNode);
-                }
-                $objNode=$objNode->mLchild;
-                if($objNode==null){
-                    $objStack->getPopStack($objNode);
-                }
-            }while($objNode!=null);
-        }else{
-            $arrBTdata=array();
-        }
+    public function getLeft() {
+        if ($this->isEmpty())
+            return false;
+        return $this->left;
     }
+ 
     /**
-     *中序遍历二叉树
+     * 给当前结点添加左子树
      *
-     *@param BTNode $objRootNode 过程中的根节点
-     *@param array $arrBTdata 接收值的数组变量,按引用方式传递
-     *@return void
+     * @param object BinaryTree $t 给当前节点添加的子树.
      */
-    public function getInorderTraversal($objRootNode,&$arrBTdata){
-        if($objRootNode!=null){
-            $this->getInorderTraversal($objRootNode->mLchild,$arrBTdata);
-            $arrBTdata[]=$objRootNode->mData;
-            $this->getInorderTraversal($objRootNode->mRchild,$arrBTdata);
-        }
+    public function attachLeft(BinaryTree $t) {
+        if ($this->isEmpty() || !$this->left->isEmpty())
+            return false;
+        $this->left = $t;
     }
+ 
     /**
-     *中序遍历的非递归算法
+     * 删除左子树
      *
-     *@param BTNode $objRootNode 二叉树根结点
-     *@param array $arrBTdata 接收值的数组变量，按引用方式传递
-     *@return void
+     * @return object BinaryTree  返回删除的左子树.
      */
-    public function getInorderTraversalNoRecursion($objRootNode,&$arrBTdata){
-        if($objRootNode instanceof BTNode){
-            $objNode=$objRootNode;
-            $objStack=new StackLinked();
-            //中序遍历左子树及访问根节点
-            do{
-                while($objNode!=null){
-                    $objStack->getPushStack($objNode);
-                    $objNode=$objNode->mLchild;
-                }
-                $objStack->getPopStack($objNode);
-                $arrBTdata[]=$objNode->mData;
-                $objNode=$objNode->mRchild;
-            }while(!$objStack->getIsEmpty());
-            //中序遍历右子树
-            do{
-                while($objNode!=null){
-                    $objStack->getPushStack($objNode);
-                    $objNode=$objNode->mLchild;
-                }
-                $objStack->getPopStack($objNode);
-                $arrBTdata[]=$objNode->mData;
-                $objNode=$objNode->mRchild;
-            }while(!$objStack->getIsEmpty());
-        }else{
-            $arrBTdata=array();
-        }
+    public function detachLeft() {
+        if ($this->isEmpty())
+            return false;
+        $result = $this->left;
+        $this->left = new BinaryTree();
+        return $result;
     }
+ 
     /**
-     *后序遍历二叉树
+     * 返回当前节点的右子树
      *
-     *@param BTNode $objRootNode  遍历过程中的根结点
-     *@param array $arrBTdata 接收值的数组变量，引用方式传递
-     *@return void
+     * @return object BinaryTree 当前节点的右子树.
      */
-    public function getPostorderTraversal($objRootNode,&$arrBTdata){
-        if($objRootNode!=null){
-            $this->getPostorderTraversal($objRootNode->mLchild,$arrBTdata);
-            $this->getPostorderTraversal($objRootNode->mRchild,$arrBTdata);
-            $arrBTdata[]=$objRootNode->mData;
-        }
+    public function getRight() {
+        if ($this->isEmpty())
+            return false;
+        return $this->right;
     }
+ 
     /**
-     *后序遍历非递归算法
+     * 给当前节点添加右子树
      *
-    BTNode $objRootNode 二叉树根节点
-    array $arrBTdata 接收值的数组变量，按引用方式传递
-    void
+     * @param object BinaryTree $t 需要添加的右子树.
      */
-    public function getPostorderTraversalNoRecursion($objRootNode,&$arrBTdata){
-        if($objRootNode instanceof BTNode){
-            $objNode=$objRootNode;
-            $objStack=new StackLinked();
-            $objTagStack=new StackLinked();
-            $tag=1;
-            do{
-                while($objNode!=null){
-                    $objStack->getPushStack($objNode);
-                    $objTagStack->getPushStack(1);
-                    $objNode=$objNode->mLchild;
-                }
-                $objTagStack->getPopStack($tag);
-                $objTagStack->getPushStack($tag);
-                if($tag == 1){
-                    $objStack->getPopStack($objNode);
-                    $objStack->getPushStack($objNode);
-                    $objNode=$objNode->mRchild;
-                    $objTagStack->getPopStack($tag);
-                    $objTagStack->getPushStack(2);
-
-                }else{
-                    $objStack->getPopStack($objNode);
-                    $arrBTdata[]=$objNode->mData;
-                    $objTagStack->getPopStack($tag);
-                    $objNode=null;
-                }
-            }while(!$objStack->getIsEmpty());
-        }else{
-            $arrBTdata=array();
-        }
+    public function attachRight(BinaryTree $t) {
+        if ($this->isEmpty() || !$this->right->isEmpty())
+            return false;
+        $this->right = $t;
     }
+ 
     /**
-     *层次遍历二叉树
-     *
-     *@param BTNode $objRootNode二叉树根节点
-     *@param array $arrBTdata 接收值的数组变量，按引用方式传递
-     *@return void
+     * 删除右子树，并返回此右子树
+     * @return object BinaryTree 删除的右子树.
      */
-    public function getLevelorderTraversal($objRootNode,&$arrBTdata){
-        if($objRootNode instanceof BTNode){
-            $objNode=$objRootNode;
-            $objQueue=new QueueLinked();
-            $objQueue->getInsertElem($objNode);
-            while(!$objQueue->getIsEmpty()){
-                $objQueue->getDeleteElem($objNode);
-                $arrBTdata[]=$objNode->mData;
-                if($objNode->mLchild != null){
-                    $objQueue->getInsertElem($objNode->mLchild);
-                }
-                if($objNode->mRchild != null){
-                    $objQueue->getInsertElem($objNode->mRchild);
-                }
-            }
-        }else{
-            $arrBTdata=array();
-        }
+    public function detachRight() {
+        if ($this->isEmpty ())
+            return false;
+        $result = $this->right;
+        $this->right = new BinaryTree();
+        return $result;
     }
+ 
     /**
-     *求二叉树叶子结点的个数
-     *
-     *@param BTNode $objRootNode 二叉树根节点
-     *@return int 参数传递错误返回-1
-     **/
-    public function getLeafNodeCount($objRootNode){
-        if($objRootNode instanceof BTNode){
-            $intLeafNodeCount=0;
-            $objNode=$objRootNode;
-            $objStack=new StackLinked();
-            do{
-                if($objNode->mLchild == null && $objNode->mRchild == null){
-                    $intLeafNodeCount++;
-                }
-                $objRNode=$objNode->mRchild;
-                if($objRNode != null){
-                    $objStack->getPushStack($objRNode);
-                }
-                $objNode=$objNode->mLchild;
-                if($objNode == null){
-                    $objStack->getPopStack($objNode);
-                }
-            }while($objNode != null);
-            return $intLeafNodeCount;
-        }else{
-            return -1;
-        }
-    }
-    /**
-     *求二叉树的深度
-     *
-     *@param BTNode $objRootNode 二叉树根节点
-     *@return int 参数传递错误返回-1
+     * 先序遍历
      */
-    public function getBinaryTreeDepth($objRootNode){
-        if($objRootNode instanceof BTNode){
-            $objNode=$objRootNode;
-            $objQueue=new QueueLinked();
-            $intBinaryTreeDepth=0;
-            $objQueue->getInsertElem($objNode);
-            $objLevel=$objNode;
-            while(!$objQueue->getIsEmpty()){
-                $objQueue->getDeleteElem($objNode);
-                if($objNode->mLchild != null){
-                    $objQueue->getInsertElem($objNode->mLchild);
-                }
-                if($objNode->mRchild != null){
-                    $objQueue->getInsertElem($objNode->mRchild);
-                }
-                if($objLevel == $objNode){
-                    $intBinaryTreeDepth++;
-                    $objLevel=@$objQueue->mRear->mElem;
-                }
-            }
-            return $intBinaryTreeDepth;
-        }else{
-            return -1;
+    public function preorderTraversal() {
+        if ($this->isEmpty()) {
+            return ;
         }
+        echo ' ', $this->getKey();
+        $this->getLeft()->preorderTraversal();
+        $this->getRight()->preorderTraversal();
+    }
+ 
+    /**
+     * 中序遍历
+     */
+    public function inorderTraversal() {
+        if ($this->isEmpty()) {
+            return ;
+        }
+        $this->getLeft()->preorderTraversal();
+        echo ' ', $this->getKey();
+        $this->getRight()->preorderTraversal();
+    }
+ 
+    /**
+     * 后序遍历
+     */
+    public function postorderTraversal() {
+        if ($this->isEmpty()) {
+            return ;
+        }
+        $this->getLeft()->preorderTraversal();
+        $this->getRight()->preorderTraversal();
+        echo ' ', $this->getKey();
     }
 }
-echo "<pre>";
-$bt=new BinaryTree(array('A','B','D','','','E','','G','','','C','F','','',''));
-echo "二叉树结构：\r\n";
-var_dump($bt);
-$btarr=array();
-echo "先序递归遍历二叉树：\r\n";
-$bt->getPreorderTraversal($bt->mRoot,$btarr);
-var_dump($btarr);
-echo "先序非递归遍历二叉树：\r\n";
-$arrBTdata=array();
-$bt->getPreorderTraversalNoRecursion($bt->mRoot,$arrBTdata);
-var_dump($arrBTdata);
-echo "中序递归遍历二叉树：\r\n";
-$arrBTdata=array();
-$bt->getInorderTraversal($bt->mRoot,$arrBTdata);
-var_dump($arrBTdata);
-echo "中序非递归遍历二叉树：\r\n";
-$arrBTdata=array();
-$bt->getInorderTraversalNoRecursion($bt->mRoot,$arrBTdata);
-var_dump($arrBTdata);
-echo "后序递归遍历二叉树：\r\n";
-$arrBTdata=array();
-$bt->getPostorderTraversal($bt->mRoot,$arrBTdata);
-var_dump($arrBTdata);
-echo "后序非递归遍历二叉树:\r\n";
-$arrBTdata=array();
-$bt->getPostorderTraversalNoRecursion($bt->mRoot,$arrBTdata);
-var_dump($arrBTdata);
-echo "按层次遍历二叉树：\r\n";
-$arrBTdata=array();
-$bt->getLevelorderTraversal($bt->mRoot,$arrBTdata);
-var_dump($arrBTdata);
-echo "叶子结点的个数为：".$bt->getLeafNodeCount($bt->mRoot);
-echo "\r\n";
-echo "二叉树深度为:".$bt->getBinaryTreeDepth($bt->mRoot);
-echo "\r\n";
-echo "判断二叉树是否为空：";
-var_dump($bt->getIsEmpty());
-echo "将二叉树置空后：";
-$bt->setBinaryTreeNull();
-var_dump($bt);
-echo "</pre>";
-?>
+ 
+/**
+ * 二叉排序树的PHP实现
+ */
+ 
+class BST extends BinaryTree {
+  /**
+     * 构造空的二叉排序树
+     */
+    public function __construct() {
+        parent::__construct(NULL, NULL, NULL);
+    }
+ 
+    /**
+     * 析构
+     */
+    public function __destruct() {
+        parent::__destruct();
+    }
+ 
+    /**
+     * 测试二叉排序树中是否包含参数所指定的值
+     *
+     * @param mixed $obj 查找的值.
+     * @return boolean True 如果存在于二叉排序树中则返回真，否则为假期
+     */
+    public function contains($obj) {
+        if ($this->isEmpty())
+            return false;
+        $diff = $this->compare($obj);
+        if ($diff == 0) {
+            return true;
+        }elseif ($diff < 0)
+            return $this->getLeft()->contains($obj);
+        else
+            return $this->getRight()->contains($obj);
+    }
+ 
+    /**
+     * 查找二叉排序树中参数所指定的值的位置
+     *
+     * @param mixed $obj 查找的值.
+     * @return boolean True 如果存在则返回包含此值的对象，否则为NULL
+     */
+    public function find($obj) {
+        if ($this->isEmpty())
+            return NULL;
+        $diff = $this->compare($obj);
+        if ($diff == 0)
+            return $this->getKey();
+        elseif ($diff < 0)
+            return $this->getLeft()->find($obj);
+        else
+            return $this->getRight()->find($obj);
+    }
+ 
+    /**
+     * 返回二叉排序树中的最小值
+     * @return mixed 如果存在则返回最小值，否则返回NULL
+     */
+    public function findMin() {
+        if ($this->isEmpty ())
+            return NULL;
+        elseif ($this->getLeft()->isEmpty())
+            return $this->getKey();
+        else
+            return $this->getLeft()->findMin();
+    }
+ 
+    /**
+     * 返回二叉排序树中的最大值
+     * @return mixed 如果存在则返回最大值，否则返回NULL
+     */
+    public function findMax() {
+        if ($this->isEmpty ())
+            return NULL;
+        elseif ($this->getRight()->isEmpty())
+            return $this->getKey();
+        else
+            return $this->getRight()->findMax();
+    }
+ 
+    /**
+     * 给二叉排序树插入指定值
+     *
+     * @param mixed $obj 需要插入的值.
+     * 如果指定的值在树中存在，则返回错误
+     */
+    public function insert($obj) {
+        if ($this->isEmpty()) {
+            $this->attachKey($obj);
+        } else {
+            $diff = $this->compare($obj);
+            if ($diff == 0)
+                die('argu error');
+            if ($diff < 0)
+                $this->getLeft()->insert($obj);
+            else
+                $this->getRight()->insert($obj);
+        }
+        $this->balance();
+    }
+ 
+ 
+ /**
+     * 从二叉排序树中删除指定的值
+     *
+     * @param mixed $obj 需要删除的值.
+     */
+    public function delete($obj) {
+        if ($this->isEmpty ())
+            die();
+ 
+        $diff = $this->compare($obj);
+        if ($diff == 0) {
+            if (!$this->getLeft()->isEmpty()) {
+                $max = $this->getLeft()->findMax();
+                $this->key = $max;
+                $this->getLeft()->delete($max);
+            }
+            elseif (!$this->getRight()->isEmpty()) {
+                $min = $this->getRight()->findMin();
+                $this->key = $min;
+                $this->getRight()->delete($min);
+            } else
+                $this->detachKey();
+        } else if ($diff < 0)
+                $this->getLeft()->delete($obj);
+            else
+                $this->getRight()->delete($obj);
+        $this->balance();
+    }
+ 
+    public function compare($obj) {
+        return $obj - $this->getKey();
+    }
+ 
+    /**
+     * Attaches the specified object as the key of this node.
+     * The node must be initially empty.
+     *
+     * @param object IObject $obj The key to attach.
+     * @exception IllegalOperationException If this node is not empty.
+     */
+    public function attachKey($obj) {
+        if (!$this->isEmpty())
+            return false;
+        $this->key = $obj;
+        $this->left = new BST();
+        $this->right = new BST();
+    }
+ 
+    /**
+     * Balances this node.
+     * Does nothing in this class.
+     */
+    protected function balance () {}
+ 
+ 
+    /**
+     * Main program.
+     *
+     * @param array $args Command-line arguments.
+     * @return integer Zero on success; non-zero on failure.
+     */
+    public static function main($args) {
+        printf("BinarySearchTree main program.\n");
+        $root = new BST();
+        foreach ($args as $row) {
+            $root->insert($row);
+        }
+        return $root;
+    }
+}
+ 
+//$root = BST::main(array(50, 3, 10, 5, 100, 56, 78));
+$arr = range(1, 10);
+shuffle($arr);
+$root = BST::main($arr);
+//echo '<pre>'; print_r($root); echo '</pre>';
+echo '<br/>';
+echo $root->findMax();
+//$root->delete(100);
+echo '<br/>';
+echo $root->findMax();
+echo '<br/>';
+echo $root->preorderTraversal();
+echo '<br/>';
+echo $root->postorderTraversal();
