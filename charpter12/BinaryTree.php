@@ -353,13 +353,16 @@ class BinaryTree
         $diff = $this->compare();
         if ($diff == 0) {
             if (!$this->getLeft()->isEmpty()) {
-                 
+                $max = $this->getLeft()->findMax();
+                $this->key = $max;
+                $this->getLeft()->delete($max);
             } elseif (!$this->getRight()->isEmpty()) {
-                
+                $min = $this->getRight()->findMin();
+                $this->key = $min;
+                $this->getRight()->delete($min);
             } else {
-                
+                $this->detachKey();
             }
-
         } elseif ($diff < 0) {
             $this->getLeft()->delete($obj);
         } else {
