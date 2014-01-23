@@ -60,6 +60,8 @@ class BinaryTree
 
     /**
      * 检查节点是否为空
+     *
+     * @return boolean
      */
     public function isEmpty()
     {
@@ -99,8 +101,10 @@ class BinaryTree
 
     /**
      * 删除key
+     *
+     * @return key
      */
-    public function detacheKey()
+    public function detachKey()
     {
         if (!$this->isLeaf()) {
             return false;
@@ -203,29 +207,41 @@ class BinaryTree
             
         }
     }
+
     /**
      * 先序遍历
      */
     public function preorderTraversal()
     {
-        echo ' ', $this->key;
+        if ($this->isEmpty()) {
+            return ;
+        }
+        echo ' ',  $this->key;
         $this->left->preorderTraversal();
         $this->right->preorderTraversal();
     }
+
     /**
      * 中序遍历
      */
     public function inorderTraversal()
     {
+        if ($this->isEmpty()) {
+            return ;
+        }
         $this->left->preorderTraversal();
         echo ' ', $this->key;
         $this->right->preorderTraversal();
     }
+
     /**
      * 后序遍历
      */
     public function postorderTraversal()
     {
+        if ($this->isEmpty()) {
+            return ;
+        }
         $this->left->preorderTraversal();
         $this->right->preorderTraversal();
         echo ' ', $this->key;
@@ -350,7 +366,7 @@ class BinaryTree
         if ($this->isEmpty()) {
             die();
         }
-        $diff = $this->compare();
+        $diff = $this->compare($obj);
         if ($diff == 0) {
             if (!$this->getLeft()->isEmpty()) {
                 $max = $this->getLeft()->findMax();
@@ -370,4 +386,31 @@ class BinaryTree
         }
 
     }
+
+    /**
+     * test
+     */
+    public static function test($args)
+    {
+        $root = new BinaryTree();
+        foreach ($args as $row) {
+            $root->insert($row);
+        }
+        return $root;
+    }
 }
+
+//$root = BST::main(array(50, 3, 10, 5, 100, 56, 78));
+$arr = range(1, 10);
+shuffle($arr);
+$root = BinaryTree::test($arr);
+//echo '<pre>'; print_r($root); echo '</pre>';
+echo '<br/>';
+echo $root->findMax();
+echo '<br/>';
+echo $root->preorderTraversal();
+$root->delete(10);
+echo '<br/>';
+echo $root->findMax();
+echo '<br/>';
+echo $root->preorderTraversal();
