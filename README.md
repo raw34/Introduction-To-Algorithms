@@ -1,2 +1,2 @@
-Introduction-to-Algorithm
+Introduction-to-Algorithms
 =============================
